@@ -198,8 +198,8 @@
             <!--DEFINE FUNCTIONS (PROCESS DATA)-->
 	function processData(data) {
 		var timestamps = [];
-		var min = Infinity; 
-		var max = -Infinity;
+		var min = 1987; 
+		var max = 2018;
 
 		for (var feature in data.features) {
 
@@ -317,7 +317,7 @@ function createLegend(min, max) {
 
 		var legendContainer = L.DomUtil.create("div", "legend");  
 		var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
-		var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)]; 
+		var classes = [roundNumber(10), roundNumber((400-10)/2), roundNumber(400)]; 
 		var legendCircle;  
 		var lastRadius = 0;
 		var currentRadius;
@@ -377,7 +377,7 @@ function createSliderUI(timestamps) {
 
 			$(slider)
 				.attr({'type':'range', 
-					'max': timestamps[timestamps.length-1], 
+					'max': timestamps[31], 
 					'min': timestamps[0], 
 					'step': 1,
 					'value': String(timestamps[0])})
