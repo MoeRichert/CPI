@@ -4,12 +4,12 @@
 <head>
     <meta charset=utf-8 />
     <title>City CPI Over Time</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <link rel="stylesheet" href="css/style-wide.css">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
     
@@ -25,6 +25,8 @@
 		<script src="js/init.js"></script>
         <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
         <script src="js/jquery.min.js"></script>
+    <script>
+    </script>
 		
 		<!--stylesheets-->
 
@@ -149,6 +151,8 @@
 			<div id="map"></div>
             
 		</div>
+			
+            
 
     <section id="side-panel">
 
@@ -162,24 +166,26 @@
     </section>
 
     <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
     <script>
         var counties = $.ajax({
             url: "https://gist.githubusercontent.com/MoeRichert/c6ef523583efa6cd131cad93ca3e5f71/raw/423686eb622a62a7bbefdc697a3cdd8c963b492f/CPIcities.geojson",
             dataType: "json",
-            success: console.log("County data successfully loaded."),
+            success: console.log("CPI data successfully loaded."),
             error: function(xhr) {
                 alert(xhr.statusText)
             }
         })
         $.when(counties).done(function(data) {
 			
-	 	
+            var SimpleDisplay = L.layerGroup();
+            var ColorDisplay = L.layerGroup();
             var map = L.map('map', {
                 // Set latitude and longitude of the map center (required)
                 center: [38.99766, -100.90838],
                 // Set the initial zoom level, values 0-18, where 0 is most zoomed-out (required)
-                zoom: 4
+                zoom: 4,
+                layers: [SimpleDisplay]
             });
             var basemap = L.tileLayer('http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.png', {
                 attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
@@ -189,6 +195,7 @@
             
             var info = processData(data);
 			createPropSymbols(info.timestamps, data);
+            
 			createLegend(info.min,info.max);
 			createSliderUI(info.timestamps);
             
@@ -198,8 +205,8 @@
             <!--DEFINE FUNCTIONS (PROCESS DATA)-->
 	function processData(data) {
 		var timestamps = [];
-		var min = 1987; 
-		var max = 2018;
+		var min = Infinity; 
+		var max = -Infinity;
 
 		for (var feature in data.features) {
 
@@ -229,16 +236,18 @@
 
 		return {
 			timestamps : timestamps,
-			min : min,
-			max : max
+			min : '1987',
+			max : '2018'
 		}
 	}
             
             <!--DEFINE FUNCTIONS (sym)-->
 
 	function createPropSymbols(timestamps, data) {
-			
-		cities = L.geoJson(data, {		
+		
+        
+        
+		SDisplay = L.geoJson(data, {		
 
 			pointToLayer: function(feature, latlng) {	
 
@@ -261,17 +270,61 @@
 					}
 				});
 			}
-		}).addTo(map);
+		}).addTo(SimpleDisplay);
+        
+        
+        
+        CDisplay = L.geoJson(data, {		
+
+			pointToLayer: function(feature, latlng) {	
+
+				return L.circleMarker(latlng, { 
+				 weight: 1, 
+				 fillOpacity: 0.6 
+				}).on({
+
+					mouseover: function(e) {
+						this.openPopup();
+						
+					},
+					mouseout: function(e) {
+						this.closePopup();
+						
+							
+					}
+				});
+			}}).addTo(ColorDisplay);
 
 		updatePropSymbols(timestamps[0]);
 
 	}
+            
+            
 
 <!--DEFINE FUNCTIONS (updatesym)-->
 
 	function updatePropSymbols(timestamp) {
+        
 		
-		cities.eachLayer(function(layer) {
+		CDisplay.eachLayer(function(layer) {
+            
+	
+			var props = layer.feature.properties;
+			var radius = calcPropRadius(props[timestamp]);
+            var colors = getColor(props[timestamp]);
+			var popupContent = "<b>" + String(props[timestamp]) + 
+					" CPI</b><br>" +
+					"<i>" + props.Name +
+					"</i> in </i>" + 
+					timestamp + "</i>";
+
+			layer.setRadius(radius);
+			layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
+            layer.setStyle({color :colors});
+		});
+        
+        SDisplay.eachLayer(function(layer) {
+            
 	
 			var props = layer.feature.properties;
 			var radius = calcPropRadius(props[timestamp]);
@@ -294,7 +347,25 @@
 		return Math.sqrt(area/Math.PI)*2;			
 	}
 
- 
+ function getColor(d) {
+    return d > 375 ? '#01004d' :
+           d > 350  ? '#49006a' :
+           d > 325  ? '#7a0177' :
+           d > 300  ? '#ae017e' :
+           d > 275   ? '#dd3497' :
+           d > 250   ? '#f2559c' :
+           d > 225   ? '#f768a1' :
+           d > 200  ? '#fa9fb5' :
+           d > 175  ? '#faa7a0' :
+           d > 150  ? '#fcc5c0' :
+           d > 125   ? '#ffd3cf' :
+           d > 100   ? '#fcc5c0' :
+           d > 75   ? '#fde0dd' :
+           d > 50  ? '#fff1ed' :
+           d > 25  ? '#fff7f3' :
+           d > 10  ? '#fff7f3' :
+                      '#FFEDA0';
+    }    
 
 
 
@@ -311,9 +382,9 @@ function createLegend(min, max) {
 				return (Math.round(inNumber/10) * 10);  
 		}
 
-		var legend = L.control( { position: 'bottomright' } );
+		var legendS = L.control( { position: 'bottomright' } );
 
-		legend.onAdd = function(map) {
+		legendS.onAdd = function(map) {
 
 		var legendContainer = L.DomUtil.create("div", "legend");  
 		var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
@@ -354,18 +425,20 @@ function createLegend(min, max) {
 
 		};
 
-		legend.addTo(map);  
+		legendS.addTo(map);  
 
 	} // end createLegend();
 
 
-	 <!--// end createLegend();-->      
+	 <!--// end createLegend();-->     
+         
+
 
 <!--DEFINE FUNCTIONS (ui)-->
 
 function createSliderUI(timestamps) {
 	
-		var sliderControl = L.control({ position: 'topright'} );
+		var sliderControl = L.control({ position: 'bottomright'} );
 
 		sliderControl.onAdd = function(map) {
 
@@ -400,7 +473,7 @@ function createSliderUI(timestamps) {
 
 	function createTemporalLegend(startTimestamp) {
 
-		var temporalLegend = L.control({ position: 'topright' }); 
+		var temporalLegend = L.control({ position: 'bottomright' }); 
 
 		temporalLegend.onAdd = function(map) { 
 			var output = L.DomUtil.create("output", "temporal-legend");
@@ -411,8 +484,15 @@ function createSliderUI(timestamps) {
 		temporalLegend.addTo(map); 
 	}
             
+            var variableops = {
+                "Color Symbols": ColorDisplay,
+                "Simple Symbols": SimpleDisplay
+            }
+            
+            
        // Add requested external GeoJSON to map
             var kyCounties = L.geoJSON(counties.responseJSON).addTo(map);     
+            var toggs = L.control.layers(variableops).addTo(map);
         
         })
       
@@ -440,3 +520,4 @@ function createSliderUI(timestamps) {
 </body>
 
 </html>
+
