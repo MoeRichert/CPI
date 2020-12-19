@@ -5,514 +5,109 @@
     <meta charset=utf-8 />
     <title>City CPI Over Time</title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style-wide.css">
+    
+     <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+   integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+   crossorigin=""/>
+    
+    
+    
+    <link rel="stylesheet" href="css/style.css">
+    
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
+    
+    
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+   integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+   crossorigin=""></script>
+    
+    <script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    
+
 
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
     
-    <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
-    
-    <link rel="stylesheet" href="css/leaflet.css">
-		<link rel="stylesheet" href="css/style.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-		<script src="js/jquery.min.js"></script>
-        <script src="js/jquery.dropotron.min.js"></script>
-        <script src="js/skel.min.js"></script>
-		<script src="js/skel-layers.min.js"></script>
-		<script src="js/init.js"></script>
-        <script src="js/bootstrap/bootstrap.bundle.min.js"></script>
-        <script src="js/jquery.min.js"></script>
-    <script>
-    </script>
-		
-		<!--stylesheets-->
-
-
-    
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: "whitesmoke";
-            font-family: "Noto Sans", sans-serif;
-            color: #3d3d3d;
-        }
-        h3 {
-            font-family: "Noto Sans", sans-serif;
-            font-size: 1em;
-            font-weight: normal;
-            text-align: center;
-            margin: 0;
-        }
-
-        #map {
-	       height: 450px;
-	       margin: 15px auto;
-        }
-
-        #side-panel {
-            position: absolute;
-            bottom: 0;
-            left: 15px;
-            width: 280px;
-            margin: 20px auto;
-            padding: 0 15px;
-            background: rgba(256, 256, 256, .8);
-            border: 1px solid grey;
-            border-radius: 3px;
-            z-index: 800;
-        }
-
-        p {
-            font-size: .9em;
-            line-height: 1.5em;
-        }
-
-        a {
-            color: #005daa;
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-        #legend {
-            position: relative;
-            margin: 20px 0;
-        }
-        #legend-large, #legend-small {
-            border: 2px solid grey;
-            border-radius: 50%;
-            background: whitesmoke;
-            position: absolute;
-        }
-        #legend-large-label, #legend-small-label {
-            position: absolute;
-        }
-        #legend hr.small, #legend hr.large {
-            width: 83px;
-            position: absolute;
-            top: -8px;
-            left: 66px;
-        }
-        .range-slider {
-                width: 50%;
-            }
-            
-            #forward {
-                float: right;
-            }
-            
-            #reverse {
-                float: left;
-            }
-
-    </style>
 </head>
 
 <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top" id="navtop">
+        <img src="img/MRP.svg" alt="Moe Richert Cartography" id="logoimg" >
+        <a href="moerichert.github.io" data-toggle="tab"><i class="fa fa-home"></i><h1>Home</h1></a>
+        <a id="abtbtn" data-toggle="tab"><i class="fas fa-question-circle"></i><h1>About</h1></a>
     
-    
+    </nav>
 
-<nav class="navbar navbar-inverse">
-            <div class="container-fluid">
-                <div class="navbar-header">
-                    <!---<a class="navbar-brand" href="index.html"><img src=img/MRP.jpg></a>--->
-                </div>
-                <div class="btn-group">
-                <div class="btn-group">
-                <a class="btn-sm" href="index.html">
-                    
-                    Home
-                    </a>
-                </div>
-                <div class="btn-group">
-                <a class="btn-sm" href="About.html">
-                    
-                    About
-                    </a>
-                </div>
-                
-
-            </div>
-            </div>
-                
-        </nav>  
-        
-        <div class="container">
-
-        <h1 class="font-weight-light text-center mt-4 mb-0">Consumer Price Index by Year</h1>
-        </div>
-        
-		<div id="wrapper">
-			<div id="map"></div>
-            
-		</div>
 			
             
+<div class="tab-content" id="info">
+    
+    <div id=mainpage>
+    
+    <div id="mapdiv"></div>
 
     <section id="side-panel">
-
+        <h3>Consumer Price Index by Year</h3>
         <p>This map indicates CPI over the years in various major cities in the United states from 1987 to 2018.</p>
-
-        <h3>Consumer Price Index</h3>
         <p></p>
         <p>The reference year for the CPI in this map is 2013, and all data was sourced from <a href="https://www.bls.gov/news.release/cpi.toc.htm">the Bureau of Labor Statistics</a></p>
         <p>For more information about CPI what it is used for, click <a href="About.html">HERE</a>.</p>
 
     </section>
-
-    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"></script>
+    </div>
+        
+    <!-- Popup -->
+    <div id="aboutMap" class="about">
+        <div class="about-content">
+            <span class="close">&times;</span>
+            <h1>What is the Consumer Price Index?</h1>
+        
+        <p>The consumer price index (CPI) is a statistic that tracks the changes in price of common consumer goods and services over time. 
+        </p>
+        <p>The CPI is constructed by taking a representative sample items and services whose prices are collected periodically. Sub-indices representing specific categories of goods (i.e. consumer electronics, food, housing, ect.) are computed, weighted as part of the index total, and then combined to produce the overall index 
+        </p>
+        <p>The annual percentage change in a CPI is used as a measure of inflation. As such, CPI is one metric that can be used to adjust for the effects of inflation, calculate the buying power of wages, develop pensions, regulate prices of goods and services, or to normalize monetary magnitudes to show changes in value across different areas such as countries.
+        </p>
+        </div>
+    </div>
+    
     <script>
-        var counties = $.ajax({
-            url: "https://gist.githubusercontent.com/MoeRichert/c6ef523583efa6cd131cad93ca3e5f71/raw/423686eb622a62a7bbefdc697a3cdd8c963b492f/CPIcities.geojson",
-            dataType: "json",
-            success: console.log("CPI data successfully loaded."),
-            error: function(xhr) {
-                alert(xhr.statusText)
-            }
-        })
-        $.when(counties).done(function(data) {
-			
-            var SimpleDisplay = L.layerGroup();
-            var ColorDisplay = L.layerGroup();
-            var map = L.map('map', {
-                // Set latitude and longitude of the map center (required)
-                center: [38.99766, -100.90838],
-                // Set the initial zoom level, values 0-18, where 0 is most zoomed-out (required)
-                zoom: 4,
-                layers: [SimpleDisplay]
-            });
-            var basemap = L.tileLayer('http://{s}.tile.stamen.com/terrain/{z}/{x}/{y}.png', {
-                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, under <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a>. Data by <a href="http://openstreetmap.org">OpenStreetMap</a>, under <a href="http://www.openstreetmap.org/copyright">ODbL</a>.',
-                subdomains: 'abcd',
-                maxZoom: 19
-            }).addTo(map);
-            
-            var info = processData(data);
-			createPropSymbols(info.timestamps, data);
-            
-			createLegend(info.min,info.max);
-			createSliderUI(info.timestamps);
-            
-            
-            
-            
-            <!--DEFINE FUNCTIONS (PROCESS DATA)-->
-	function processData(data) {
-		var timestamps = [];
-		var min = Infinity; 
-		var max = -Infinity;
+    // Get the popup
+    var popup = document.getElementById("aboutMap");
 
-		for (var feature in data.features) {
+    var btn = document.getElementById("abtbtn");
 
-			var properties = data.features[feature].properties; 
+    var span = document.getElementsByClassName("close")[0];
 
-			for (var attribute in properties) { 
+    // open the popup
+    btn.onclick = function() {
+      popup.style.display = "block";
+    }
 
-				if ( attribute != 'id' &&
-				  attribute != 'name' &&
-				  attribute != 'lat' &&
-				  attribute != 'long' ) {
-						
-					if ( $.inArray(attribute,timestamps) === -1) {
-						timestamps.push(attribute);		
-					}
+    // close the popup
+    span.onclick = function() {
+      popup.style.display = "none";
+    }
 
-					if (properties[attribute] < min) {	
-						min = properties[attribute];
-					}
-						
-				if (properties[attribute] > max) { 
-						max = properties[attribute]; 
-					}
-				}
-			}
-		}
-
-		return {
-			timestamps : timestamps,
-			min : '1987',
-			max : '2018'
-		}
-	}
-            
-            <!--DEFINE FUNCTIONS (sym)-->
-
-	function createPropSymbols(timestamps, data) {
-		
-        
-        
-		SDisplay = L.geoJson(data, {		
-
-			pointToLayer: function(feature, latlng) {	
-
-				return L.circleMarker(latlng, { 
-			
-				 fillColor: "#708598",
-				 color: "#537898",
-				 weight: 1, 
-				 fillOpacity: 0.6 
-				}).on({
-
-					mouseover: function(e) {
-						this.openPopup();
-						this.setStyle({color: 'yellow'});
-					},
-					mouseout: function(e) {
-						this.closePopup();
-						this.setStyle({color: '#537898'});
-							
-					}
-				});
-			}
-		}).addTo(SimpleDisplay);
-        
-        
-        
-        CDisplay = L.geoJson(data, {		
-
-			pointToLayer: function(feature, latlng) {	
-
-				return L.circleMarker(latlng, { 
-				 weight: 1, 
-				 fillOpacity: 0.6 
-				}).on({
-
-					mouseover: function(e) {
-						this.openPopup();
-						
-					},
-					mouseout: function(e) {
-						this.closePopup();
-						
-							
-					}
-				});
-			}}).addTo(ColorDisplay);
-
-		updatePropSymbols(timestamps[0]);
-
-	}
-            
-            
-
-<!--DEFINE FUNCTIONS (updatesym)-->
-
-	function updatePropSymbols(timestamp) {
-        
-		
-		CDisplay.eachLayer(function(layer) {
-            
-	
-			var props = layer.feature.properties;
-			var radius = calcPropRadius(props[timestamp]);
-            var colors = getColor(props[timestamp]);
-			var popupContent = "<b>" + String(props[timestamp]) + 
-					" CPI</b><br>" +
-					"<i>" + props.Name +
-					"</i> in </i>" + 
-					timestamp + "</i>";
-
-			layer.setRadius(radius);
-			layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
-            layer.setStyle({color :colors});
-		});
-        
-        SDisplay.eachLayer(function(layer) {
-            
-	
-			var props = layer.feature.properties;
-			var radius = calcPropRadius(props[timestamp]);
-			var popupContent = "<b>" + String(props[timestamp]) + 
-					" CPI</b><br>" +
-					"<i>" + props.Name +
-					"</i> in </i>" + 
-					timestamp + "</i>";
-
-			layer.setRadius(radius);
-			layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
-		});
-	}
-
-<!--wat-->
-	function calcPropRadius(attributeValue) {
-
-		var scaleFactor = 5;
-		var area = attributeValue * scaleFactor;
-		return Math.sqrt(area/Math.PI)*2;			
-	}
-
- function getColor(d) {
-    return d > 375 ? '#01004d' :
-           d > 350  ? '#49006a' :
-           d > 325  ? '#7a0177' :
-           d > 300  ? '#ae017e' :
-           d > 275   ? '#dd3497' :
-           d > 250   ? '#f2559c' :
-           d > 225   ? '#f768a1' :
-           d > 200  ? '#fa9fb5' :
-           d > 175  ? '#faa7a0' :
-           d > 150  ? '#fcc5c0' :
-           d > 125   ? '#ffd3cf' :
-           d > 100   ? '#fcc5c0' :
-           d > 75   ? '#fde0dd' :
-           d > 50  ? '#fff1ed' :
-           d > 25  ? '#fff7f3' :
-           d > 10  ? '#fff7f3' :
-                      '#FFEDA0';
-    }    
-
-
-
-<!--DEFINE FUNCTIONS (lgnd)-->
-        
-function createLegend(min, max) {
-		 
-		if (min < 10) {	
-			min = 10; 
-		}
-
-		function roundNumber(inNumber) {
-
-				return (Math.round(inNumber/10) * 10);  
-		}
-
-		var legendS = L.control( { position: 'bottomright' } );
-
-		legendS.onAdd = function(map) {
-
-		var legendContainer = L.DomUtil.create("div", "legend");  
-		var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
-		var classes = [roundNumber(10), roundNumber((400-10)/2), roundNumber(400)]; 
-		var legendCircle;  
-		var lastRadius = 0;
-		var currentRadius;
-		var margin;
-
-		L.DomEvent.addListener(legendContainer, 'mousedown', function(e) { 
-			L.DomEvent.stopPropagation(e); 
-		});  
-
-		$(legendContainer).append("<h2 id='legendTitle'>City CPI</h2>");
-		
-		for (var i = 0; i <= classes.length-1; i++) {  
-
-			legendCircle = L.DomUtil.create("div", "legendCircle");  
-			
-			currentRadius = calcPropRadius(classes[i]);
-			
-			margin = -currentRadius - lastRadius - 2;
-
-			$(legendCircle).attr("style", "width: " + currentRadius*2 + 
-				"px; height: " + currentRadius*2 + 
-				"px; margin-left: " + margin + "px" );				
-			$(legendCircle).append("<span class='legendValue'>"+classes[i]+"</span>");
-
-			$(symbolsContainer).append(legendCircle);
-
-			lastRadius = currentRadius;
-
-		}
-
-		$(legendContainer).append(symbolsContainer); 
-
-		return legendContainer; 
-
-		};
-
-		legendS.addTo(map);  
-
-	} // end createLegend();
-
-
-	 <!--// end createLegend();-->     
-         
-
-
-<!--DEFINE FUNCTIONS (ui)-->
-
-function createSliderUI(timestamps) {
-	
-		var sliderControl = L.control({ position: 'bottomright'} );
-
-		sliderControl.onAdd = function(map) {
-
-			var slider = L.DomUtil.create("input", "range-slider");
-	
-			L.DomEvent.addListener(slider, 'mousedown', function(e) { 
-				L.DomEvent.stopPropagation(e); 
-			});
-
-			$(slider)
-				.attr({'type':'range', 
-					'max': timestamps[31], 
-					'min': timestamps[0], 
-					'step': 1,
-					'value': String(timestamps[0])})
-		  		.on('input change', function() {
-		  		updatePropSymbols($(this).val().toString());
-		  			$(".temporal-legend").text(this.value);
-		  	});
-			return slider;
-		}
-
-		sliderControl.addTo(map)
-		createTemporalLegend(timestamps[0]); 
-	}
-
-            
-            
-    
-
-<!--DEFINE FUNCTIONS (tl)-->
-
-	function createTemporalLegend(startTimestamp) {
-
-		var temporalLegend = L.control({ position: 'bottomright' }); 
-
-		temporalLegend.onAdd = function(map) { 
-			var output = L.DomUtil.create("output", "temporal-legend");
- 			$(output).text(startTimestamp)
-			return output; 
-		}
-
-		temporalLegend.addTo(map); 
-	}
-            
-            var variableops = {
-                "Color Symbols": ColorDisplay,
-                "Simple Symbols": SimpleDisplay
-            }
-            
-            
-       // Add requested external GeoJSON to map
-            var kyCounties = L.geoJSON(counties.responseJSON).addTo(map);     
-            var toggs = L.control.layers(variableops).addTo(map);
-        
-        })
-      
-	.fail(function() { alert("There has been a problem loading the data.")});
-      
-      
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+      if (event.target == popup) {
+        popup.style.display = "none";
+      }
+    }
     </script>
-    
 
-
-
-
-		<!--scripts-->
-        <link rel="stylesheet" type="text/css" href="css/style.css">
-        
-
-
-
-
-
+<script src="js/main.js"></script>
         
 
         
