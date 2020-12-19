@@ -1,23 +1,40 @@
-$(document).ready(function() {
+function getData(){
+    
+    L.Icon.Default.prototype.options.iconSize = [0, 0];
+    L.Icon.Default.prototype.options.shadowSize = [0, 0];
 
-		
-
-
-<!--GEOJSON DATA HERE-->
-
-
-	$.getJSON("gisfiles/citydata.geojson")  
-		.done(function(data) {
-			var info = processData(data);
+    // load the cancer tract data 
+    var counties = $.getJSON("data/CPIcities.geojson");
+        
+        $.when(counties).then(function(data) {
+			
+            var SimpleDisplay = L.layerGroup();
+            var ColorDisplay = L.layerGroup();
+            var map = L.map('mapdiv', {
+                // Set latitude and longitude of the map center (required)
+                center: [38.99766, -100.90838],
+                // Set the initial zoom level, values 0-18, where 0 is most zoomed-out (required)
+                zoom: 4,
+                layers: [SimpleDisplay]
+            });
+            var basemap = L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}', {
+                attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                subdomains: 'abcd',
+                minZoom: 0,
+                maxZoom: 18,
+                ext: 'png'
+            }).addTo(map);
+            
+            var info = processData(data);
 			createPropSymbols(info.timestamps, data);
+            
 			createLegend(info.min,info.max);
 			createSliderUI(info.timestamps);
-	 	})
-	.fail(function() { alert("There has been a problem loading the data.")});
-
-
-
-<!--DEFINE FUNCTIONS (PROCESS DATA)-->
+            
+            
+            
+            
+            <!--DEFINE FUNCTIONS (PROCESS DATA)-->
 	function processData(data) {
 		var timestamps = [];
 		var min = Infinity; 
@@ -51,23 +68,25 @@ $(document).ready(function() {
 
 		return {
 			timestamps : timestamps,
-			min : min,
-			max : max
+			min : '1987',
+			max : '2018'
 		}
 	}
-
-<!--DEFINE FUNCTIONS (sym)-->
+            
+            <!--DEFINE FUNCTIONS (sym)-->
 
 	function createPropSymbols(timestamps, data) {
-			
-		cities = L.geoJson(data, {		
+		
+        
+        
+		SDisplay = L.geoJson(data, {		
 
 			pointToLayer: function(feature, latlng) {	
 
 				return L.circleMarker(latlng, { 
 			
 				 fillColor: "#708598",
-				 color: '#537898'
+				 color: "#537898",
 				 weight: 1, 
 				 fillOpacity: 0.6 
 				}).on({
@@ -83,23 +102,67 @@ $(document).ready(function() {
 					}
 				});
 			}
-		}).addTo(map);
+		}).addTo(SimpleDisplay);
+        
+        
+        
+        CDisplay = L.geoJson(data, {		
+
+			pointToLayer: function(feature, latlng) {	
+
+				return L.circleMarker(latlng, { 
+				 weight: 1, 
+				 fillOpacity: 0.6 
+				}).on({
+
+					mouseover: function(e) {
+						this.openPopup();
+						
+					},
+					mouseout: function(e) {
+						this.closePopup();
+						
+							
+					}
+				});
+			}}).addTo(ColorDisplay);
 
 		updatePropSymbols(timestamps[0]);
 
 	}
+            
+            
 
 <!--DEFINE FUNCTIONS (updatesym)-->
 
 	function updatePropSymbols(timestamp) {
+        
 		
-		cities.eachLayer(function(layer) {
+		CDisplay.eachLayer(function(layer) {
+            
+	
+			var props = layer.feature.properties;
+			var radius = calcPropRadius(props[timestamp]);
+            var colors = getColor(props[timestamp]);
+			var popupContent = "<b>" + String(props[timestamp]) + 
+					" CPI</b><br>" +
+					"<i>" + props.Name +
+					"</i> in </i>" + 
+					timestamp + "</i>";
+
+			layer.setRadius(radius);
+			layer.bindPopup(popupContent, { offset: new L.Point(0,-radius) });
+            layer.setStyle({color :colors});
+		});
+        
+        SDisplay.eachLayer(function(layer) {
+            
 	
 			var props = layer.feature.properties;
 			var radius = calcPropRadius(props[timestamp]);
 			var popupContent = "<b>" + String(props[timestamp]) + 
-					" units</b><br>" +
-					"<i>" + props.name +
+					" CPI</b><br>" +
+					"<i>" + props.Name +
 					"</i> in </i>" + 
 					timestamp + "</i>";
 
@@ -108,21 +171,39 @@ $(document).ready(function() {
 		});
 	}
 
-<!--
+<!--wat-->
 	function calcPropRadius(attributeValue) {
 
-		var scaleFactor = 16;
+		var scaleFactor = 5;
 		var area = attributeValue * scaleFactor;
 		return Math.sqrt(area/Math.PI)*2;			
 	}
 
-
+ function getColor(d) {
+    return d > 375 ? '#01004d' :
+           d > 350  ? '#49006a' :
+           d > 325  ? '#7a0177' :
+           d > 300  ? '#ae017e' :
+           d > 275   ? '#dd3497' :
+           d > 250   ? '#f2559c' :
+           d > 225   ? '#f768a1' :
+           d > 200  ? '#fa9fb5' :
+           d > 175  ? '#faa7a0' :
+           d > 150  ? '#fcc5c0' :
+           d > 125   ? '#ffd3cf' :
+           d > 100   ? '#fcc5c0' :
+           d > 75   ? '#fde0dd' :
+           d > 50  ? '#fff1ed' :
+           d > 25  ? '#fff7f3' :
+           d > 10  ? '#fff7f3' :
+                      '#FFEDA0';
+    }    
 
 
 
 <!--DEFINE FUNCTIONS (lgnd)-->
-
-	function createLegend(min, max) {
+        
+function createLegend(min, max) {
 		 
 		if (min < 10) {	
 			min = 10; 
@@ -133,13 +214,13 @@ $(document).ready(function() {
 				return (Math.round(inNumber/10) * 10);  
 		}
 
-		var legend = L.control( { position: 'bottomright' } );
+		var legendS = L.control( { position: 'bottomright' } );
 
-		legend.onAdd = function(map) {
+		legendS.onAdd = function(map) {
 
 		var legendContainer = L.DomUtil.create("div", "legend");  
 		var symbolsContainer = L.DomUtil.create("div", "symbolsContainer");
-		var classes = [roundNumber(min), roundNumber((max-min)/2), roundNumber(max)]; 
+		var classes = [roundNumber(10), roundNumber((400-10)/2), roundNumber(400)]; 
 		var legendCircle;  
 		var lastRadius = 0;
 		var currentRadius;
@@ -149,7 +230,7 @@ $(document).ready(function() {
 			L.DomEvent.stopPropagation(e); 
 		});  
 
-		$(legendContainer).append(<h2 id='legendTitle'>Number of somethings</h2>);
+		$(legendContainer).append("<h2 id='legendTitle'>City CPI</h2>");
 		
 		for (var i = 0; i <= classes.length-1; i++) {  
 
@@ -162,7 +243,7 @@ $(document).ready(function() {
 			$(legendCircle).attr("style", "width: " + currentRadius*2 + 
 				"px; height: " + currentRadius*2 + 
 				"px; margin-left: " + margin + "px" );				
-			$(legendCircle).append(""<h2 id='legendTitle'># of somethings</h2>");
+			$(legendCircle).append("<span class='legendValue'>"+classes[i]+"</span>");
 
 			$(symbolsContainer).append(legendCircle);
 
@@ -176,27 +257,30 @@ $(document).ready(function() {
 
 		};
 
-		legend.addTo(map);  
+		legendS.addTo(map);  
 
 	} // end createLegend();
 
+
+	 <!--// end createLegend();-->     
+         
+
+
 <!--DEFINE FUNCTIONS (ui)-->
 
-	function createSliderUI(timestamps) {
+function createSliderUI(timestamps) {
 	
-		var sliderControl = L.control({ position: 'bottomleft'} );
+		var sliderControl = L.control({ position: 'bottomright'} );
 
 		sliderControl.onAdd = function(map) {
 
 			var slider = L.DomUtil.create("input", "range-slider");
 	
-			L.DomEvent.addListener(slider, 'mousedown', function(e) { 
-				L.DomEvent.stopPropagation(e); 
-			});
+			
 
 			$(slider)
 				.attr({'type':'range', 
-					'max': timestamps[timestamps.length-1], 
+					'max': timestamps[31], 
 					'min': timestamps[0], 
 					'step': 1,
 					'value': String(timestamps[0])})
@@ -208,14 +292,23 @@ $(document).ready(function() {
 		}
 
 		sliderControl.addTo(map)
+    
+    L.DomEvent.addListener(sliderControl, 'mousedown', function(e) { 
+        L.DomEvent.stopPropagation(e); 
+    });
+    
 		createTemporalLegend(timestamps[0]); 
 	}
+
+            
+            
+    
 
 <!--DEFINE FUNCTIONS (tl)-->
 
 	function createTemporalLegend(startTimestamp) {
 
-		var temporalLegend = L.control({ position: 'bottomleft' }); 
+		var temporalLegend = L.control({ position: 'bottomright' }); 
 
 		temporalLegend.onAdd = function(map) { 
 			var output = L.DomUtil.create("output", "temporal-legend");
@@ -225,21 +318,29 @@ $(document).ready(function() {
 
 		temporalLegend.addTo(map); 
 	}
-
-
-<!-- POPUP -->
             
-
-
-
-            var popup = L.popup();
-
-            function onMapClick(e) {
-                popup
-                    .setLatLng(e.latlng)
-                    .setContent(e.latlng.toString())
-                    .openOn(map);
+            var variableops = {
+                "Color Symbols": ColorDisplay,
+                "Simple Symbols": SimpleDisplay
             }
+            
+            
+       // Add requested GeoJSON to map
+            var kyCounties = L.geoJSON(counties.responseJSON).addTo(map);     
+            var toggs = L.control.layers(variableops).addTo(map);
+        
+        })
+      
+	.fail(function() { alert("There has been a problem loading the data.")});
+}
+    
+//when the page loads, AJAX & call createMap to render map tiles and data.
+$(document).ready(init);
+function init(){
 
-            map.on('click', onMapClick);
+    getData();
+  	//create map home button
+  	$("logoimg").on("click", function(){
+    	globalMap.flyTo([38.99766, -100.90838], 5.5); //[lat, lng], zoom
     });
+};
